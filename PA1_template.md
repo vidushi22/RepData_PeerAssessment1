@@ -8,7 +8,8 @@ output:
 
 ## Loading and preprocessing the data
 
-```{r Hist-Total-Steps-per-Day}
+
+```r
 # build a subset of the complete values
 data <- read.csv(unz("activity.zip","activity.csv"),colClasses=c("integer","Date","integer"))
 completes<-subset(data,complete.cases(data)==TRUE)              
@@ -27,16 +28,25 @@ text(mean(dailySteps),25,labels="mean", pos=4, col="blue")
 text(median(dailySteps),23,labels="median", pos=4, col="red")   
 ```
 
+![plot of chunk Hist-Total-Steps-per-Day](figure/Hist-Total-Steps-per-Day.png) 
+
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 summary(dailySteps) 
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    8840   10800   10800   13300   21200
 ```
 
 ## What is the average daily activity pattern?
 
-```{r 5-Interval-Time-Series}
+
+```r
 #split by interval and calculate average for each interval
 splitByInterval <- split(completes,completes$interval, drop=TRUE) 
 intervalAvg <- sapply(splitByInterval, function(x) mean(x$steps))   
@@ -49,25 +59,31 @@ abline(v=which.max(intervalAvg), lty=3, col="blue")
 text(which.max(intervalAvg),max(intervalAvg),  
      labels=paste("max = ",as.character(round(max(intervalAvg)))), 
      pos=4, col="blue")      
+```
 
+![plot of chunk 5-Interval-Time-Series](figure/5-Interval-Time-Series.png) 
+
+```r
 maxinterval <- names(which.max(intervalAvg))
 maxsteps <- round(max(intervalAvg))
 ```
 
-Maximum number of steps are `r maxsteps` taken in the interval `r maxinterval`.
+Maximum number of steps are 206 taken in the interval 835.
 
 ## Imputing missing values
 
 
-```{r}
+
+```r
 #find the rows with missing values
 originalValue <- complete.cases(data)
 nMissing <- length(originalValue[originalValue==FALSE])
 ```
 
-There are a total of `r nMissing` values.
+There are a total of 2304 values.
 
-```{r NewHistogram}
+
+```r
 newData <- cbind(data,originalValue)          
 
 # split newData by whether missing data or not
@@ -90,15 +106,32 @@ abline(v=mean(dailySteps), lty=3, col="blue")                            # draw 
 abline(v=median(dailySteps), lty=4, col="red")                           # draw a red line thru the median  
 text(mean(dailySteps),35,labels="mean", pos=4, col="blue")               # label the mean  
 text(median(dailySteps),33,labels="median", pos=4, col="red")              # label the median  
+```
 
+![plot of chunk NewHistogram](figure/NewHistogram.png) 
+
+```r
 summary(dailySteps)   
+```
 
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    8840   10800   10800   13300   21200
+```
+
+```r
 summary(dailyStepsNew)   
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    9820   10800   10800   12800   21200
 ```
 
 The mean and median total number of steps per day are exactly the same.
 
-```{r Original-vs-New-hist}
+
+```r
 par(mfrow=c(1,2))
 
 ### plot the original histogram
@@ -116,9 +149,12 @@ text(mean(dailySteps),35,labels="mean", pos=4, col="blue")         # label the m
 text(median(dailySteps),33,labels="median", pos=4, col="red")        # label the median  
 ```
 
+![plot of chunk Original-vs-New-hist](figure/Original-vs-New-hist.png) 
+
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r weeken-vs-weekday-activity}
+
+```r
 # build a 'day' factor to hold weekday / weekend
 newData$day <- weekdays(newData$date)                                
 for (i in 1:nrow(newData)) {                                         
@@ -143,4 +179,6 @@ with(stepsByDay[stepsByDay$day == "weekday",], lines(steps ~ interval, type="l",
 with(stepsByDay[stepsByDay$day == "weekend",], lines(steps ~ interval, type="l", col="blue" ))  
 legend("topright", lty=c(1,1), col = c("red", "blue"), legend = c("weekday", "weekend"), seg.len=3)
 ```
+
+![plot of chunk weeken-vs-weekday-activity](figure/weeken-vs-weekday-activity.png) 
 
